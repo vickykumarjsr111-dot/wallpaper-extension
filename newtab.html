@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>New Tab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="wallpaper-container">
+    <img id="wallpaper-img" src="" alt="Wallpaper">
+    <video id="wallpaper-video" autoplay loop muted playsinline></video>
+
+    <div id="upload-overlay">
+      <label for="file-input" id="upload-btn">🖼️ Set Wallpaper (Image or Video)</label>
+      <input type="file" id="file-input" accept="image/*,video/*">
+    </div>
+
+    <div id="clock" class="style-minimal">
+      <div id="time"></div>
+      <div id="date"></div>
+      <div id="analog-face"></div>
+      <div id="futuristic-face">
+        <div id="futuristic-day"></div>
+        <div id="futuristic-date"></div>
+        <div id="futuristic-time"></div>
+      </div>
+    </div>
+
+    <div id="settings-panel">
+      <h4>Clock Style</h4>
+      <div class="style-option" data-style="minimal">
+        <span>Minimal</span><span class="check">✓</span>
+      </div>
+      <div class="style-option" data-style="digital">
+        <span>Digital</span><span class="check">✓</span>
+      </div>
+      <div class="style-option" data-style="boxed">
+        <span>Boxed</span><span class="check">✓</span>
+      </div>
+      <div class="style-option" data-style="analog">
+        <span>Analog</span><span class="check">✓</span>
+      </div>
+      <div class="style-option" data-style="futuristic">
+        <span>Futuristic</span><span class="check">✓</span>
+      </div>
+      <div class="style-option" data-style="hidden">
+        <span>Hidden</span><span class="check">✓</span>
+      </div>
+    </div>
+
+    <button id="settings-btn" title="Clock Settings">🕐</button>
+    <button id="change-btn" title="Change Wallpaper">⚙️</button>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

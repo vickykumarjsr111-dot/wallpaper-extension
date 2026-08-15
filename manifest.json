@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "My Custom Wallpaper",
+  "version": "1.0",
+  "description": "Replace new tab with your own wallpaper",
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "permissions": ["storage"],
+  "web_accessible_resources": [
+    {
+      "resources": ["fonts/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self'"
+  }
+}
