@@ -90,7 +90,6 @@ changeBtn.addEventListener('click', () => {
   fileInput.click();
 });
 
-// ===== CLOCK STYLE SETTINGS =====
 const STYLES = ['minimal', 'digital', 'boxed', 'analog', 'futuristic', 'hidden'];
 
 function applyClockStyle(styleName) {
@@ -127,7 +126,6 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// ===== BUILD ANALOG CLOCK TICKS (once) =====
 function buildAnalogTicks() {
   for (let i = 0; i < 12; i++) {
     const tick = document.createElement('div');
@@ -195,7 +193,35 @@ function updateClock() {
   updateFuturisticClock(now);
 }
 
-// ===== DRAGGABLE CLOCK =====
+let clockLocked = false;
+
+const lockBtn = document.createElement('div');
+lockBtn.id = 'lock-btn';
+lockBtn.textContent = '🔓';
+clock.appendChild(lockBtn);
+
+function updateLockIcon() {
+  lockBtn.textContent = clockLocked ? '🔒' : '🔓';
+}
+
+function saveLockState() {
+  chrome.storage.local.set({ clockLocked });
+}
+
+function loadLockState() {
+  chrome.storage.local.get(['clockLocked'], (result) => {
+    clockLocked = result.clockLocked || false;
+    updateLockIcon();
+  });
+}
+
+lockBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  clockLocked = !clockLocked;
+  updateLockIcon();
+  saveLockState();
+});
+
 let isDragging = false;
 let dragOffsetX = 0;
 let dragOffsetY = 0;
@@ -203,8 +229,10 @@ let dragOffsetY = 0;
 function loadClockPosition() {
   chrome.storage.local.get(['clockPos'], (result) => {
     if (result.clockPos) {
-      clock.style.left = result.clockPos.left;
-      clock.style.top = result.clockPos.top;
+      const leftPx = (result.clockPos.leftPercent / 100) * window.innerWidth;
+      const topPx = (result.clockPos.topPercent / 100) * window.innerHeight;
+      clock.style.left = leftPx + 'px';
+      clock.style.top = topPx + 'px';
       clock.style.transform = 'none';
     }
   });
@@ -212,15 +240,18 @@ function loadClockPosition() {
 
 function saveClockPosition() {
   const rect = clock.getBoundingClientRect();
+  const leftPercent = (rect.left / window.innerWidth) * 100;
+  const topPercent = (rect.top / window.innerHeight) * 100;
   chrome.storage.local.set({
     clockPos: {
-      left: rect.left + 'px',
-      top: rect.top + 'px'
+      leftPercent,
+      topPercent
     }
   });
 }
 
 clock.addEventListener('mousedown', (e) => {
+  if (clockLocked || e.target === lockBtn) return;
   isDragging = true;
   clock.classList.add('dragging');
   const rect = clock.getBoundingClientRect();
@@ -251,9 +282,50 @@ document.addEventListener('mouseup', () => {
   }
 });
 
+window.addEventListener('resize', () => {
+  loadClockPosition();
+});
+
+// ===== WATERMARK =====
+const WATERMARK_TEXT = 'Created by @vickykumarjsr111-dot';
+const WATERMARK_ID = 'watermark';
+
+function createWatermark() {
+  const mark = document.createElement('div');
+  mark.id = WATERMARK_ID;
+  mark.textContent = WATERMARK_TEXT;
+  mark.style.cssText = `
+    position: fixed;
+    bottom: 12px;
+    right: 16px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    user-select: none;
+    z-index: 999999;
+    letter-spacing: 0.5px;
+  `;
+  document.body.appendChild(mark);
+}
+
+function ensureWatermark() {
+  const existing = document.getElementById(WATERMARK_ID);
+  if (!existing || existing.textContent !== WATERMARK_TEXT) {
+    if (existing) existing.remove();
+    createWatermark();
+  }
+}
+
+createWatermark();
+setInterval(ensureWatermark, 2000);
+
 buildAnalogTicks();
 setInterval(updateClock, 1000);
 updateClock();
 loadWallpaper();
 loadClockStyle();
 loadClockPosition();
+loadLockState();
